@@ -1,0 +1,15 @@
+@CHARSET "ISO-8859-1";
+#leftpanel3>div.ui-panel-inner>a.ui-icon-delete {
+background: white;
+border: 0px;
+margin-bottom: 20px;
+}
+.ui-collapsible {
+	margin:0 -1em;
+}
+.ui-listview>li h4 {
+	margin:0;
+}
+.ui-listview>.ui-li-static {
+	padding: 0em 1em;
+}

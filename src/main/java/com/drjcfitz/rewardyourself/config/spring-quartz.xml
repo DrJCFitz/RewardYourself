@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+	<bean id="testClass" class="com.drjcfitz.rewardyourself.cron.PortalTask">
+	</bean>
+	
+	<bean name="runMI" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="testClass" />
+		<property name="targetMethod" value="updateDb" />
+	</bean>
+
+	<bean name="runJD" class="org.springframework.scheduling.quartz.JobDetailBean">
+		<property name="jobClass" value="com.drjcfitz.rewardyourself.cron.ChronTask" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="myTask" value-ref="testClass" />
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="cronTrigger"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="runMI"/>
+		<property name="cronExpression" value="0 0/1 * * * ?" />
+	</bean>
+	<bean id="testTrigger"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="runMI" />
+		<property name="repeatInterval" value="300000" />
+		<property name="startDelay" value="5000" />
+	</bean>
+	
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="jobDetails">
+			<list>
+			</list>
+		</property>
+		<property name="triggers">
+			<list>
+			</list>
+		</property>
+	</bean>
+</beans>
