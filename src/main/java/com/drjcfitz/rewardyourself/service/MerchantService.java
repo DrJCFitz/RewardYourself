@@ -27,8 +27,25 @@ public class MerchantService {
 		merchantDao.createMerchant(listMerchant, site);
 	}
 	
-	public List<Merchant> getMerchantData(String portal, String storeName) {
-		return merchantDao.getMerchantData(portal, storeName);
+	public List<Merchant> getMerchantData(String portal, String storeKey) {
+		return merchantDao.getMerchantData(portal, storeKey);
+	}
+
+
+	public List<Merchant> getAllMerchantNamesKeys() {
+		return merchantDao.getAllMerchantNamesKeys();
+	}
+
+	public void updateDbMerchant(List<Merchant> listMerchant, String site) {
+		merchantDao.updateDbMerchant(listMerchant, site);
+	}
+	
+	public List<Merchant> getAllMerchantDbData(String portal) {
+		return merchantDao.getAllMerchantDbData(portal);
+	}
+	
+	public List<Merchant> getEnabledMerchantData(String portal) {
+		return merchantDao.getEnabledMerchantData(portal);
 	}
 
 }

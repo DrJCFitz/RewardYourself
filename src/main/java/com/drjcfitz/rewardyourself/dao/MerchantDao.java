@@ -3,6 +3,7 @@ package com.drjcfitz.rewardyourself.dao;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -36,38 +37,67 @@ public class MerchantDao {
 			params.add(new BeanPropertySqlParameterSource(merch));
 		}
 
-		jdbc.batchUpdate("insert ignore into merchant (name) values (:name)",
+		jdbc.batchUpdate("insert ignore into merchant (name, mkey) values (:name, :mkey)",
 					params.toArray(new SqlParameterSource[0]));
 		jdbc.batchUpdate("update " + site + " set enabled=false where " + 
-					"(LOWER(name)=LOWER(:name) and (rewardValue<>:rewardValue or rewardUnit<>:rewardUnit))", 
+					"(mkey=:mkey and (rewardValue<>:rewardValue or rewardUnit<>:rewardUnit))", 
 					params.toArray(new SqlParameterSource[0]));
 		jdbc.batchUpdate("insert ignore into " + site + 
-				" (name, storeLink, rewardValue, rewardUnit, rewardRate, enabled, refDate)" +
-				" values (:name, :storeLink, :rewardValue, :rewardUnit, :rewardRate, :enabled, :refDate)", 
+				" (mkey, storeLink, rewardValue, rewardUnit, rewardRate, enabled, refDate)" +
+				" values (:mkey, :storeLink, :rewardValue, :rewardUnit, :rewardRate, :enabled, :refDate)", 
 				params.toArray(new SqlParameterSource[0]));
 	}
+	
+	//@Transactional
+	public void updateDbMerchant(List<Merchant> merchant, String site) {
+		List<SqlParameterSource> params = new ArrayList<SqlParameterSource>();
+		for (Merchant merch : merchant) {
+			params.add(new BeanPropertySqlParameterSource(merch));
+		}
 
-	public List<Merchant> getAllMerchants() {
-		return jdbc.query(
-				"select * from merchant as a, ebates as b where a.mkey=b.mkey",
-				new RowMapper<Merchant>() {
-					public Merchant mapRow(ResultSet rs, int rowNum)
-							throws SQLException {
-						Merchant merch = new Merchant(rs.getString("name"), 
-								rs.getString("storeLink"), 
-								new Reward(rs.getDouble("rewards"), rs.getString("rewardType")),
-								rs.getLong("refDate"), 
-								rs.getBoolean("enabled"));
-						return merch;
-					}
-				});
+		//jdbc.batchUpdate("insert ignore into merchant (name, mkey) values (:name, :mkey)",
+		//			params.toArray(new SqlParameterSource[0]));
+		jdbc.batchUpdate("update " + site + " set mkey=:mkey where " + 
+					"id=:id", params.toArray(new SqlParameterSource[0]));
 	}
 
-	public List<Merchant> getMerchantData(String portal, String storeName) {
+	public List<Merchant> getAllMerchantNamesKeys() {
+		return jdbc.query("select name, mkey from merchant order by name", new RowMapper<Merchant>() {
+
+			public Merchant mapRow(ResultSet rs, int row) throws SQLException {
+				Merchant merchant = new Merchant();
+				merchant.setName(rs.getString("name"));
+				merchant.setMkey(rs.getString("mkey"));
+				return merchant;
+			}
+		});
+	}
+
+	public List<Merchant> getMerchantData(String portal, String storeMkey) {
 		// Using RowMapper over BeanPropertyRowMapper since Reward bean set methods throwing nullpointer exception
-		return jdbc.query("select merchant.name, storeLink, rewardValue, rewardRate, rewardUnit, "+
-					"refDate, enabled "+
-					"from merchant inner join "+portal+" on merchant.name="+portal+".name where merchant.name=\""+storeName+"\"",
+		return jdbc.query("select a.name, b.mkey, b.id, b.storeLink, b.rewardValue, b.rewardUnit, b.rewardRate, b.refDate, b.enabled " +
+				"from merchant as a right join " + portal + " as b on a.mkey=b.mkey where b.mkey=\""+storeMkey+"\"",
+				new RowMapper<Merchant>(){
+					public Merchant mapRow(ResultSet rs, int rowNum)
+							throws SQLException {
+						Reward reward = new Reward(rs.getDouble("rewardValue"), 
+								rs.getString("rewardRate"),
+								rs.getString("rewardUnit"));
+						return new Merchant(rs.getString("name"),
+								rs.getString("mkey"),
+								rs.getString("storeLink"),
+								reward,
+								rs.getLong("refDate"),
+								rs.getBoolean("enabled"),
+								rs.getInt("id"));
+					}});
+	}
+
+	public List<Merchant> getAllMerchantDbData(String portal) {
+		// Using RowMapper over BeanPropertyRowMapper since 'Reward' bean set methods throwing nullpointer exception
+		return jdbc.query("select name, mkey, storeLink, rewardValue, rewardRate, rewardUnit, "+
+					"refDate, enabled, id "+
+					"from "+portal,
 						new RowMapper<Merchant>(){
 
 							public Merchant mapRow(ResultSet rs, int rowNum)
@@ -77,13 +107,36 @@ public class MerchantDao {
 										rs.getString("rewardUnit"));
 								
 								return new Merchant(rs.getString("name"),
+										rs.getString("mkey"),
 										rs.getString("storeLink"),
 										reward,
 										rs.getLong("refDate"),
-										rs.getBoolean("enabled"));
+										rs.getBoolean("enabled"),
+										rs.getInt("id"));
 							}});
 	}
-	
+
+	public List<Merchant> getEnabledMerchantData(String portal) {
+		// Using RowMapper over BeanPropertyRowMapper since 'Reward' bean set methods throwing nullpointer exception
+		return jdbc.query("select a.name, a.mkey, " +
+				"b.storeLink, b.rewardValue, b.rewardUnit, b.rewardRate, b.refDate, b.enabled " +
+				"from merchant as a right join " + portal + " as b on a.mkey=b.mkey where b.enabled=true",
+				new RowMapper<Merchant>(){
+					public Merchant mapRow(ResultSet rs, int rowNum)
+							throws SQLException {
+						Reward reward = new Reward(rs.getDouble("rewardValue"), 
+								rs.getString("rewardRate"),
+								rs.getString("rewardUnit"));
+						
+						return new Merchant(rs.getString("name"),
+								rs.getString("mkey"),
+								rs.getString("storeLink"),
+								reward,
+								rs.getLong("refDate"),
+								rs.getBoolean("enabled"));
+					}});
+	}
+
 	public List<Merchant> getActiveMerchants(String site) {
 		return jdbc
 				.query("select name, enabled, refDate, rewards, rewardType, storeLink from merchant as a,"

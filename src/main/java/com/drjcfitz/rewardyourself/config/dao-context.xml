@@ -9,7 +9,7 @@
 
 
 	<context:annotation-config></context:annotation-config>
-	<context:component-scan base-package="com.drjcfitz.rewardyourself.dao">
+	<context:component-scan base-package="com.drjcfitz.rewardyourself">
 	</context:component-scan>
 
 	<context:property-placeholder />

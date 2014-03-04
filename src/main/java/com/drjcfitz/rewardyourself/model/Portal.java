@@ -1,83 +1,70 @@
 package com.drjcfitz.rewardyourself.model;
 
+import java.util.List;
+
 public class Portal {
-	
-	private String profile;
-	private String element;
-	private String portalUrl;
-	private String storesUrl;
-	private String storeElement;
-	private String merchElement;
-	private String rewardElement;
-	private String rewardRegexp;
+
+	private String portalKey;
+	private String portalName;
+	private Double equivalentPercentage;
+	private List<Merchant> merchantList;
 
 	public Portal() {
-		
-	}
-	
-	public String getProfile() {
-		return profile;
 	}
 
-	public void setProfile(String profile) {
-		this.profile = profile;
+	public Portal(String portalName, Double equivalentPercentage,
+			List<Merchant> merchantList) {
+		super();
+		this.portalName = portalName;
+		this.equivalentPercentage = equivalentPercentage;
+		this.merchantList = merchantList;
 	}
 
-	public String getElement() {
-		return element;
+	public Portal(String portalName, String portalKey,
+			Double equivalentPercentage, List<Merchant> merchantList) {
+		super();
+		this.portalName = portalName;
+		this.portalKey = portalKey;
+		this.equivalentPercentage = equivalentPercentage;
+		this.merchantList = merchantList;
 	}
 
-	public void setElement(String element) {
-		this.element = element;
+	public String getPortalKey() {
+		return portalKey;
 	}
 
-	public String getMerchElement() {
-		return merchElement;
+	public void setPortalKey(String portalKey) {
+		this.portalKey = portalKey;
 	}
 
-	public void setMerchElement(String merchElement) {
-		this.merchElement = merchElement;
+	public Double getEquivalentPercentage() {
+		return equivalentPercentage;
 	}
 
-	public String getPortalUrl() {
-		return portalUrl;
+	public void setEquivalentPercentage(Double equivalentPercentage) {
+		this.equivalentPercentage = equivalentPercentage;
 	}
 
-	public void setPortalUrl(String portalUrl) {
-		this.portalUrl = portalUrl;
+	public List<Merchant> getMerchantList() {
+		return merchantList;
 	}
 
-	public String getRewardElement() {
-		return rewardElement;
+	public void setMerchantList(List<Merchant> merchantList) {
+		this.merchantList = merchantList;
 	}
 
-	public void setRewardElement(String rewardElement) {
-		this.rewardElement = rewardElement;
+	public String getPortalName() {
+		return portalName;
 	}
 
-	public String getStoreElement() {
-		return storeElement;
+	public void setPortalName(String portalName) {
+		this.portalName = portalName;
 	}
 
-	public void setStoreElement(String storeElement) {
-		this.storeElement = storeElement;
+	@Override
+	public String toString() {
+		return "Portal [portalName=" + portalName + ", equivalentPercentage="
+				+ equivalentPercentage + ", merchantList=" + merchantList + "]";
 	}
-
-	public String getRewardRegexp() {
-		return rewardRegexp;
-	}
-
-	public void setRewardRegexp(String rewardRegexp) {
-		this.rewardRegexp = rewardRegexp;
-	}
-
-	public String getStoresUrl() {
-		return storesUrl;
-	}
-
-	public void setStoresUrl(String storesUrl) {
-		this.storesUrl = storesUrl;
-	}
-
 
 }
