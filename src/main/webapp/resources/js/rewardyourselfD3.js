@@ -1,6 +1,6 @@
-var window_width = $(window).width();
-var body_width = $('body').width();
-var svg_dim = [body_width, 0.75/2*body_width];
+var $window_width = $(window).width();
+//var $body_width = $('body').width();
+var $svg_dim = [$window_width, 0.75/2*$window_width];
 var margin = {top:30, right:40, bottom:50, left:50};
 var legend_width = 50;
 var color = d3.scale.category20c();
@@ -20,36 +20,38 @@ var div_tooltip = d3.select("body")
 			.style("opacity", 0);
 	});
 
-var canvas = d3.select("#trendPlot")
-		.append("svg")
-		.attr({'width':window_width,
-			'height':svg_dim[1]});
+var xScale = d3.time.scale().domain([new Date(0),new Date()]).range([margin.left, $svg_dim[0] - legend_width - margin.right * 2]).nice();
+var yScale = d3.scale.linear().domain([0,1]).range([$svg_dim[1] - margin.bottom, margin.top]).nice();
+var xAxis = d3.svg.axis().orient("bottom");
+var yAxis = d3.svg.axis().orient("left");
 
-var group = canvas.append("g")
-		.attr('class','plot')
-		.attr("transform", "translate("+(window_width-svg_dim[0])/2+",0)");
+$(document).delegate("#trends", "pageinit", function() {
 
-xAxis_gr = group.append('g')
-	.attr({'class':'xAxis axis',
-		'transform':'translate(0,' + (svg_dim[1] - margin.bottom) + ')'});
+	var canvas = d3.select("#trendPlot")
+			.append("svg")
+			.attr({'width':$svg_dim[0],
+				'height':$svg_dim[1]});
 	
-yAxis_gr = group.append('g')
-	.attr({'class':'yAxis axis',
-		'transform':'translate('+margin.left+',0)'});
-
-yAxis_label = yAxis_gr.append('g').attr('class','label').append('text');
-yAxis_label.text('Equivalent Cash Back (%)')
-	.attr({'y':-margin.left, 
-			'x':-svg_dim[1]/2, 
-			'text-anchor':'middle', 
-			'transform':'rotate(-90)',
-			'visibility':'hidden'});
-
-var xScale = d3.time.scale().domain([new Date(0),new Date()]).range([margin.left, svg_dim[0] - legend_width - margin.right * 2]).nice()
-var yScale = d3.scale.linear().domain([0,1]).range([svg_dim[1] - margin.bottom, margin.top]).nice()
-var xAxis = d3.svg.axis().orient("bottom")
-var yAxis = d3.svg.axis().orient("left")
-
+	var group = canvas.append("g")
+			.attr('class','plot')
+			.attr("transform", "translate("+($svg_dim[0]-$svg_dim[0])/2+",0)");
+	
+	xAxis_gr = group.append('g')
+		.attr({'class':'xAxis axis',
+			'transform':'translate(0,' + ($svg_dim[1] - margin.bottom) + ')'});
+		
+	yAxis_gr = group.append('g')
+		.attr({'class':'yAxis axis',
+			'transform':'translate('+margin.left+',0)'});
+	
+	yAxis_label = yAxis_gr.append('g').attr('class','label').append('text');
+	yAxis_label.text('Equivalent Cash Back (%)')
+		.attr({'y':-margin.left, 
+				'x':-$svg_dim[1]/2, 
+				'text-anchor':'middle', 
+				'transform':'rotate(-90)',
+				'visibility':'hidden'});
+});
 
 function update(dataTrans) {
 
@@ -61,6 +63,7 @@ function update(dataTrans) {
 	yScale.domain([minReward(orderedData), maxReward(orderedData)]);
 	xAxis.scale(xScale);
 	yAxis.scale(yScale);
+	group = d3.selectAll('div#trendPlot>svg>g');
 	group.selectAll('g.xAxis').call(xAxis);
 	group.selectAll('g.xAxis text')	
         .style('text-anchor', 'end')
@@ -167,7 +170,7 @@ function update(dataTrans) {
 		d3.select(this)
 			.append('rect')
 			.style({'fill':color(portalKeys.indexOf(d.key))})
-			.attr({'x':svg_dim[0]-legend_width-margin.right -20,
+			.attr({'x':$svg_dim[0]-legend_width-margin.right -20,
 					'y':i*1.5+'em',
 					'width':20,
 					'height':10, 
@@ -176,7 +179,7 @@ function update(dataTrans) {
 
 		d3.select(this)
 			.append('text')
-			.attr({'x':svg_dim[0]-legend_width-margin.right, 
+			.attr({'x':$svg_dim[0]-legend_width-margin.right, 
 					'dy':'0.6em', 
 					'dx':'0.5em',
 					'y':i*1.5+'em',
@@ -234,7 +237,7 @@ var minDate = function(dataIn) {
 	return d3.min(parseData(dataIn,true),function(d,i) { 
 		return d3.min(d.value, function(m,l) {
 			return nestedDate(m,l);});
-	})
+	});
 }
 
 var maxReward = function(dataIn) { 

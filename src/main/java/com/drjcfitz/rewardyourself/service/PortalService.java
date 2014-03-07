@@ -51,7 +51,7 @@ public class PortalService {
 					upromisePortal}));
 	
 	// Return Portal object for home page
-	public HashMap<String, Portal> getPortals() throws IOException {
+	public HashMap<String, Portal> getPortalData() throws IOException {
 		HashMap<String, Portal> portalMap = new HashMap<String,Portal>();
 		
 		for (PortalProfile profile : profileList) {
@@ -59,22 +59,60 @@ public class PortalService {
 				if (profile.getProfileKey().equals(portal.getPortalKey())) {
 					portalMap.put(profile.getProfileKey(), new Portal(portal.getPortalName(),
 							portal.getEquivalentPercentage(),
-							merchantService.getEnabledMerchantData(profile.getProfileKey())));
+							merchantService.getCurrentPortalData(profile.getProfileKey())));
 				}
 			}
 		}
 		return portalMap;
 	}
 
-	public HashMap<String, List<Merchant>> getStoreMap(String storeKey) {
-		HashMap<String, List<Merchant>> storeMap = new HashMap<String, List<Merchant>>();
-		
+	// Return list of portals
+	// note that a merchantList is not set/included in the Portal object
+	public List<Portal> getPortals() throws IOException {
+		return portalList;
+	}
+
+	public HashMap<String, List<Merchant>> getAllStoreData(String storeKey) {
+		HashMap<String, List<Merchant>> storeMap = new HashMap<String, List<Merchant>>();	
 		for (Portal portal : portalList) {
 			storeMap.put(portal.getPortalKey(), 
 					merchantService.getMerchantData(portal.getPortalKey(), 
 							storeKey));
 		}
-		
 		return storeMap;
+	}
+	
+	public HashMap<String, Portal> getCurrentMerchantData(String storeKey) {
+		HashMap<String, Portal> currData = new HashMap<String, Portal>();	
+		for (Portal portal : portalList) {
+			currData.put(portal.getPortalKey(), 
+					new Portal(portal.getPortalName(),
+							portal.getEquivalentPercentage(),
+							merchantService.getCurrentMerchantData(portal.getPortalKey(), storeKey)));
+		}
+		return currData;
+	}
+	
+	public HashMap<String, List<Merchant>> processPortals() throws IOException {
+		HashMap<String, List<Merchant>> processedPortals = new HashMap<String, List<Merchant>>();
+		ProcessMerchant processMerchant = new ProcessMerchant();
+		for (PortalProfile profile : profileList) {
+			processedPortals.put(profile.getProfileKey(), 
+					processMerchant.listStores(profile));
+		}
+		return processedPortals;
+	}
+
+	public HashMap<String, Portal> getCurrentPortalData(String portalName) {
+		HashMap<String, Portal> currData = new HashMap<String, Portal>();	
+		for (Portal portal : portalList) {
+			if (portal.getPortalKey().equals(portalName)) {
+				currData.put(portal.getPortalKey(), 
+						new Portal(portal.getPortalName(),
+								portal.getEquivalentPercentage(),
+								merchantService.getCurrentPortalData(portal.getPortalKey())));
+			}
+		}
+		return currData;
 	}
 }

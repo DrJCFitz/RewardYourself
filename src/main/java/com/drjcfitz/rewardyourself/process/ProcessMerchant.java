@@ -33,13 +33,12 @@ public class ProcessMerchant {
 			merchant.setStoreLink(profile.getPortalUrl()+link.select(profile.getMerchantElement()).attr("href"));
 			String merchName = link.select(profile.getMerchantElement()).text().trim();
 			
-			if (profile.getProfileName().equals("upromise")) {
+			if (profile.getProfileKey().equals("upromise")) {
 				reward = link.text().substring(merchName.length()).toLowerCase().trim();
 			} else {
 				reward = link.select(profile.getRewardElement()).text().trim().toLowerCase();
 			}
 			merchant.setReward(parseRewardsValue(reward, profile));
-			
 			merchName = merchName.replaceAll(profile.getPortalRegexp().get("exclusionName"), "");
 			merchant.setName(merchName);
 			merchant.setMkey(parseMerchKey(merchName));
@@ -70,7 +69,6 @@ public class ProcessMerchant {
 		Matcher match = rewardPattern.matcher(rs);
 		while (match.find()) {
 			if (match.group("val") != null && !match.group("val").isEmpty()) {
-				System.out.println(match.group("val"));
 				reward.setRewardValue(Double.valueOf(match.group("val").replaceAll("\\s", "")));
 			}
 			

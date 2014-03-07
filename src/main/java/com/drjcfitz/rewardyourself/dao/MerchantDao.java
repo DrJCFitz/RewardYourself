@@ -116,7 +116,7 @@ public class MerchantDao {
 							}});
 	}
 
-	public List<Merchant> getEnabledMerchantData(String portal) {
+	public List<Merchant> getCurrentPortalData(String portal) {
 		// Using RowMapper over BeanPropertyRowMapper since 'Reward' bean set methods throwing nullpointer exception
 		return jdbc.query("select a.name, a.mkey, " +
 				"b.storeLink, b.rewardValue, b.rewardUnit, b.rewardRate, b.refDate, b.enabled " +
@@ -158,19 +158,29 @@ public class MerchantDao {
 						});*/
 	}
 
-	public boolean merchExistsGlobal(Merchant merchant) {
+	public List<Merchant> getCurrentMerchantData(String portal, String storeKey) {
 		MapSqlParameterSource params = new MapSqlParameterSource();
-		params.addValue("mkey", merchant.getName().toLowerCase());
-		return jdbc.queryForObject(
-				"select count(*) from merchant where mkey=:mkey", params,
-				Integer.class) > 0;
-	}
-
-	public boolean merchExistsSite(Merchant merchant, String site) {
-		MapSqlParameterSource params = new MapSqlParameterSource();
-		params.addValue("mkey", merchant.getName().toLowerCase());
-		return jdbc.queryForObject("select count(*) from " + site
-				+ " where mkey=:mkey", params, Integer.class) > 0;
-	}
+		params.addValue("mkey", storeKey);
+		return jdbc.query("select a.name, a.mkey, " +
+						"b.storeLink, b.rewardValue, b.rewardUnit, b.rewardRate, b.refDate, b.enabled " +
+						"from merchant as a right join " + portal + " as b on a.mkey=b.mkey where b.enabled=true " +
+						"and b.mkey=:mkey",
+						params, 
+						new RowMapper<Merchant>(){
+							@Override
+							public Merchant mapRow(ResultSet rs, int arg)
+									throws SQLException {
+								Reward reward = new Reward(rs.getDouble("rewardValue"), 
+										rs.getString("rewardRate"),
+										rs.getString("rewardUnit"));
+								
+								return new Merchant(rs.getString("name"),
+										rs.getString("mkey"),
+										rs.getString("storeLink"),
+										reward,
+										rs.getLong("refDate"),
+										rs.getBoolean("enabled"));
+							}});
+		}
 
 }

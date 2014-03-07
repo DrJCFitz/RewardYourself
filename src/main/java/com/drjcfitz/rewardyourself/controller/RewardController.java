@@ -40,12 +40,17 @@ public class RewardController {
 	// Bind Portal object to mobile page
 	@RequestMapping(value="/", method=RequestMethod.GET)
 	public String showMobile(Model model) throws IOException {
-		HashMap<String,Portal> portalMap= portalService.getPortals();
+		List<Portal> portalList= portalService.getPortals();
 		List<Merchant> orderedMerchant = merchantService.getAllMerchantNamesKeys();
 		
-		model.addAttribute("portalMap", portalMap);
+		model.addAttribute("portalList", portalList);
 		model.addAttribute("orderedMerchant", orderedMerchant);
 		
 		return "mobile";
 	}	
+	
+	@RequestMapping(value="/panels", method=RequestMethod.GET)
+	public String showPanels(Model model) {
+		return "panels";
+	}
 }

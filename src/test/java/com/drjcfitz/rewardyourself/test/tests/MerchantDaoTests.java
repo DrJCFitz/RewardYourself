@@ -49,11 +49,11 @@ public class MerchantDaoTests {
 	public void init() {
 		JdbcTemplate jdbc = new JdbcTemplate(dataSource);
 
-		//jdbc.execute("delete from marriott");
-		//jdbc.execute("delete from ebates");
-		//jdbc.execute("delete from upromise");
-		//jdbc.execute("delete from united");
-		//jdbc.execute("delete from merchant");
+		jdbc.execute("delete from marriott");
+		jdbc.execute("delete from ebates");
+		jdbc.execute("delete from upromise");
+		jdbc.execute("delete from united");
+		jdbc.execute("delete from merchant");
 	}
 
 	//@Test
@@ -73,21 +73,7 @@ public class MerchantDaoTests {
 	
 	//@Test
 	public void testPortalData() {
-		HashMap<String, List<Merchant>> storeDataMap = new HashMap<String, List<Merchant>>();
-		PortalService portalTask = new PortalService(); 
-		String storeName = "Cache";
-		//for (Portal portal : portalList) {
-			//storeDataMap = portalTask.getStoreData(storeName, portalList);
-			/*storeDataMap.put(portal.getProfile(),
-					merchantService.getMerchantData(portal.getProfile(),
-							storeName));*/
-		//}
-
-		for (Map.Entry<String, List<Merchant>> entry : storeDataMap.entrySet()) {
-			for (Merchant merch : entry.getValue()) {
-				System.out.println(entry.getKey() + " : " + merch);
-			}
-		}
+		
 	}
 	
 	//@Test
@@ -114,7 +100,7 @@ public class MerchantDaoTests {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void testEnabledMerchant() {
 		List<Merchant> merchList = merchantService.getEnabledMerchantData("ebates");
 		for (Merchant merch : merchList) {

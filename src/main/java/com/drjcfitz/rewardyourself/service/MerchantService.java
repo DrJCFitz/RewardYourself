@@ -18,11 +18,6 @@ public class MerchantService {
 		this.merchantDao = merchantDao;
 	}
 
-	
-	public boolean merchExists(Merchant merchant) {
-		return merchantDao.merchExistsGlobal(merchant);
-	}
-
 	public void create(List<Merchant> listMerchant, String site) {
 		merchantDao.createMerchant(listMerchant, site);
 	}
@@ -30,7 +25,10 @@ public class MerchantService {
 	public List<Merchant> getMerchantData(String portal, String storeKey) {
 		return merchantDao.getMerchantData(portal, storeKey);
 	}
-
+	
+	public List<Merchant> getCurrentMerchantData(String portal, String storeKey) {
+		return merchantDao.getCurrentMerchantData(portal, storeKey);
+	}
 
 	public List<Merchant> getAllMerchantNamesKeys() {
 		return merchantDao.getAllMerchantNamesKeys();
@@ -44,8 +42,8 @@ public class MerchantService {
 		return merchantDao.getAllMerchantDbData(portal);
 	}
 	
-	public List<Merchant> getEnabledMerchantData(String portal) {
-		return merchantDao.getEnabledMerchantData(portal);
+	public List<Merchant> getCurrentPortalData(String portal) {
+		return merchantDao.getCurrentPortalData(portal);
 	}
 
 }
